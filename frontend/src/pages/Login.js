@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
+import AuthContext from '../components/AuthContext';
 
 const StyledLoginForm = styled.div`
   width: 300px;
@@ -101,36 +102,63 @@ const ErrorPopupContainer = styled(PopupContainer)`
 `;
 
 const Login = () => {
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const { login } = useContext(AuthContext);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const { username, password } = formData;
+    const isAuthenticated = login(username, password);
+    if (isAuthenticated) {
+      setShowSuccessPopup(true);
+      setShowErrorPopup(false);
+    } else {
+      setShowSuccessPopup(false);
+      setShowErrorPopup(true);
+    }
+  };
+
   return (
     <StyledLoginForm>
       <h2>Connexion</h2>
-      <StyledForm>
+      <StyledForm onSubmit={handleSubmit}>
         <StyledLabel htmlFor="username">Nom d'utilisateur:</StyledLabel>
-        <StyledInput type="text" id="username" required />
+        <StyledInput type="text" id="username" value={formData.username} onChange={handleChange} required />
 
         <StyledLabel htmlFor="password">Mot de passe:</StyledLabel>
-        <StyledInput type="password" id="password" required />
+        <StyledInput type="password" id="password" value={formData.password} onChange={handleChange} required />
 
-        <StyledButton type="button">Se connecter</StyledButton>
+        <StyledButton type="submit">Se connecter</StyledButton>
       </StyledForm>
 
-      <PopupContainer>
-        <PopupContent>
-          <SuccessIcon>✔</SuccessIcon>
-          <span>Connecté avec succès!</span>
-          <CloseButton>&times;</CloseButton>
-        </PopupContent>
-        <BottomBorder />
-      </PopupContainer>
+      {showSuccessPopup && (
+        <PopupContainer>
+          <PopupContent>
+            <SuccessIcon>✔</SuccessIcon>
+            <span>Connecté avec succès!</span>
+            <CloseButton onClick={() => setShowSuccessPopup(false)}>&times;</CloseButton>
+          </PopupContent>
+          <BottomBorder />
+        </PopupContainer>
+      )}
 
-      <ErrorPopupContainer>
-        <PopupContent>
-          <ErrorIcon>!</ErrorIcon>
-          <span>Echec de la connexion</span>
-          <CloseButton>&times;</CloseButton>
-        </PopupContent>
-        <BottomBorder style={{ background: 'linear-gradient(to right, red 75%, lightcoral 25%)' }} />
-      </ErrorPopupContainer>
+      {showErrorPopup && (
+        <ErrorPopupContainer>
+          <PopupContent>
+            <ErrorIcon>!</ErrorIcon>
+            <span>Echec de la connexion</span>
+            <CloseButton onClick={() => setShowErrorPopup(false)}>&times;</CloseButton>
+          </PopupContent>
+          <BottomBorder style={{ background: 'linear-gradient(to right, red 75%, lightcoral 25%)' }} />
+        </ErrorPopupContainer>
+      )}
     </StyledLoginForm>
   );
 };

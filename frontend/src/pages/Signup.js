@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import AuthContext from '../components/AuthContext';
 
 const StyledSignupForm = styled.div`
   width: 300px;

@@ -7,10 +7,12 @@ import AddRecipe from './pages/AddRecipe';
 import EditRecipe from './pages/EditRecipe';
 import RecipeDetail from './pages/RecipeDetail';
 import Navbar from './components/Navbar';
+import { AuthProvider } from './components/AuthContext';
 
 const App = () => {
   return (
     <Router>
+        <AuthProvider> 
       <Navbar />
       <Routes>
         <Route path="/" element={<Login />} />
@@ -21,6 +23,7 @@ const App = () => {
         <Route path="/EditRecipe" element={<EditRecipe />} />
         <Route path="/RecipeDetail" element={<RecipeDetail />} />
       </Routes>
+      </AuthProvider> 
     </Router>
   );
 };
