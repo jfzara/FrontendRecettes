@@ -3,9 +3,13 @@ import styled from 'styled-components'
 
 
 const StyledRecipeList = styled.div`
-  max-width: 800px;
+ 
   margin: auto;
   padding: 20px;
+  display: flex;
+  flex-wrap: wrap; 
+  justify-content: center;
+  gap: 20px; 
 `;
 
 const SearchBar = styled.input`
@@ -25,6 +29,7 @@ const RecipeCard = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 20px;
+  padding-bottom: 1rem
 `;
 
 const RecipeImage = styled.img`
@@ -50,6 +55,7 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 0 10px 10px 10px;
+  margin-bottom: 1rem;
 `;
 
 const ModifyButton = styled.button`
@@ -96,7 +102,7 @@ const RecipeList = () => {
               <ModifyButton>Modifier</ModifyButton>
               <DeleteButton>Supprimer</DeleteButton>
             </ButtonContainer>
-            
+
           </RecipeCard>
         ))}
       </StyledRecipeList>
