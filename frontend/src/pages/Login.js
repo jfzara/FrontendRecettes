@@ -1,5 +1,7 @@
 import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import AuthContext from '../components/AuthContext';
 
 const StyledLoginForm = styled.div`
@@ -42,69 +44,8 @@ const StyledButton = styled.button`
   }
 `;
 
-const PopupContainer = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  height: 80px;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 9999;
-  margin-top: -100px; /* Ajuste la position verticale */
-`;
-
-const IconCircle = styled.div`
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
-`;
-
-const SuccessIcon = styled(IconCircle)`
-  background-color: green;
-  color: white;
-`;
-
-const ErrorIcon = styled(IconCircle)`
-  background-color: red;
-  color: white;
-`;
-
-const PopupContent = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  height: 100%;
-`;
-
-const CloseButton = styled.span`
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  cursor: pointer;
-`;
-
-const BottomBorder = styled.div`
-  height: 5px;
-  background: linear-gradient(to right, green 75%, lightgreen 25%);
-`;
-
-const ErrorPopupContainer = styled(PopupContainer)`
-  border-color: red;
-  margin-top: 20px; /* Ajuste la position verticale */
-`;
-
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [showErrorPopup, setShowErrorPopup] = useState(false);
   const { login } = useContext(AuthContext);
 
   const handleChange = (e) => {
@@ -117,16 +58,15 @@ const Login = () => {
     const { username, password } = formData;
     const isAuthenticated = login(username, password);
     if (isAuthenticated) {
-      setShowSuccessPopup(true);
-      setShowErrorPopup(false);
+      toast.success('Connecté avec succès!');
     } else {
-      setShowSuccessPopup(false);
-      setShowErrorPopup(true);
+      toast.error('Échec de la connexion');
     }
   };
 
   return (
     <StyledLoginForm>
+      <ToastContainer />
       <h2>Connexion</h2>
       <StyledForm onSubmit={handleSubmit}>
         <StyledLabel htmlFor="username">Nom d'utilisateur:</StyledLabel>
@@ -137,28 +77,6 @@ const Login = () => {
 
         <StyledButton type="submit">Se connecter</StyledButton>
       </StyledForm>
-
-      {showSuccessPopup && (
-        <PopupContainer>
-          <PopupContent>
-            <SuccessIcon>✔</SuccessIcon>
-            <span>Connecté avec succès!</span>
-            <CloseButton onClick={() => setShowSuccessPopup(false)}>&times;</CloseButton>
-          </PopupContent>
-          <BottomBorder />
-        </PopupContainer>
-      )}
-
-      {showErrorPopup && (
-        <ErrorPopupContainer>
-          <PopupContent>
-            <ErrorIcon>!</ErrorIcon>
-            <span>Echec de la connexion</span>
-            <CloseButton onClick={() => setShowErrorPopup(false)}>&times;</CloseButton>
-          </PopupContent>
-          <BottomBorder style={{ background: 'linear-gradient(to right, red 75%, lightcoral 25%)' }} />
-        </ErrorPopupContainer>
-      )}
     </StyledLoginForm>
   );
 };

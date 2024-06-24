@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const StyledRecipeList = styled.div`
   margin: auto;
@@ -27,8 +28,7 @@ const RecipeCard = styled.div`
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  margin-bottom: 20px;
-  padding-bottom: 1rem;
+  margin-bottom: 1rem;
 `;
 
 const RecipeImage = styled.img`
@@ -57,15 +57,6 @@ const ButtonContainer = styled.div`
   margin-bottom: 1rem;
 `;
 
-const DetailButton = styled.button`
-  background-color: lightgrey;
-  color: black;
-  border: none;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-`;
-
 const ModifyButton = styled.button`
   background-color: yellow;
   color: black;
@@ -84,21 +75,25 @@ const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
+const DetailButton = styled.button`
+  background-color: lightgrey;
+  color: black;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+`;
+
 const RecipeList = ({ recipes, setRecipes }) => {
   const navigate = useNavigate();
-  const [recipeList, setRecipeList] = useState(recipes);
 
   const handleDelete = (id) => {
-    const updatedRecipes = recipeList.filter(recipe => recipe.id !== id);
-    setRecipeList(updatedRecipes);
+    const updatedRecipes = recipes.filter(recipe => recipe.id !== id);
     setRecipes(updatedRecipes);
+    toast.success('Recette supprimée avec succès!');
   };
 
-  const handleModify = (id) => {
-    navigate(`/EditRecipe/${id}`);
-  };
-
-  const handleViewDetail = (id) => {
+  const handleDetail = (id) => {
     navigate(`/RecipeDetail/${id}`);
   };
 
@@ -107,18 +102,18 @@ const RecipeList = ({ recipes, setRecipes }) => {
       <h2>Liste des Recettes</h2>
       <SearchBar type="text" placeholder="Rechercher des recettes..." />
 
-      {recipeList.map(recipe => (
+      {recipes.map((recipe) => (
         <RecipeCard key={recipe.id}>
-          <RecipeImage src={recipe.imageUrl} alt={recipe.recipeName} />
+          <RecipeImage src={recipe.imageUrl} alt={recipe.title} />
           <RecipeDetails>
             <RecipeTitle>{recipe.recipeName}</RecipeTitle>
-            <RecipeCategory>{recipe.category}</RecipeCategory>
+            <RecipeCategory><strong>Catégorie:</strong> {recipe.category}</RecipeCategory>
+            <ButtonContainer>
+              <ModifyButton onClick={() => navigate(`/EditRecipe/${recipe.id}`)}>Modifier</ModifyButton>
+              <DeleteButton onClick={() => handleDelete(recipe.id)}>Supprimer</DeleteButton>
+              <DetailButton onClick={() => handleDetail(recipe.id)}>Détails</DetailButton>
+            </ButtonContainer>
           </RecipeDetails>
-          <ButtonContainer>
-            <DetailButton onClick={() => handleViewDetail(recipe.id)}>Détails</DetailButton>
-            <ModifyButton onClick={() => handleModify(recipe.id)}>Modifier</ModifyButton>
-            <DeleteButton onClick={() => handleDelete(recipe.id)}>Supprimer</DeleteButton>
-          </ButtonContainer>
         </RecipeCard>
       ))}
     </StyledRecipeList>

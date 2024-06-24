@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Navigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const StyledAddRecipeForm = styled.div`
   width: 400px;
@@ -74,10 +75,9 @@ const AddRecipe = ({ recipes, setRecipes }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newRecipe = { ...recipeData, id: recipes.length + 1 };
+    const newRecipe = { ...recipeData, id: recipes.length + 1 }; // Adding an ID
     setRecipes([...recipes, newRecipe]);
-    console.log('Nouvelle recette ajoutée:', newRecipe);
-    // Réinitialiser le formulaire
+    toast.success('Recette ajoutée avec succès!'); // Notification
     setRecipeData({
       recipeName: '',
       ingredients: '',
