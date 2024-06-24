@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const StyledRecipeList = styled.div`
   margin: auto;
@@ -27,7 +28,7 @@ const RecipeCard = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 20px;
-  padding-bottom: 1rem;  /* Added padding-bottom */
+  padding-bottom: 1rem; /* Ajouter le padding-bottom */
 `;
 
 const RecipeImage = styled.img`
@@ -74,15 +75,18 @@ const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
-const RecipeList = ({ recipes }) => {
-  // Utiliser le hook useState pour gérer la liste des recettes
+const RecipeList = ({ recipes, setRecipes }) => {
+  const navigate = useNavigate();
   const [recipeList, setRecipeList] = useState(recipes);
 
-  // Fonction pour supprimer une recette
   const handleDelete = (id) => {
     const updatedRecipes = recipeList.filter(recipe => recipe.id !== id);
     setRecipeList(updatedRecipes);
-    // Ici, vous pouvez implémenter la logique pour supprimer la recette de votre backend
+    setRecipes(updatedRecipes);
+  };
+
+  const handleModify = (id) => {
+    navigate(`/EditRecipe/${id}`);
   };
 
   return (
@@ -90,15 +94,15 @@ const RecipeList = ({ recipes }) => {
       <h2>Liste des Recettes</h2>
       <SearchBar type="text" placeholder="Rechercher des recettes..." />
 
-      {recipeList.map((recipe, index) => (
-        <RecipeCard key={index}>
+      {recipeList.map(recipe => (
+        <RecipeCard key={recipe.id}>
           <RecipeImage src={recipe.imageUrl} alt={recipe.recipeName} />
           <RecipeDetails>
             <RecipeTitle>{recipe.recipeName}</RecipeTitle>
             <RecipeCategory>{recipe.category}</RecipeCategory>
           </RecipeDetails>
           <ButtonContainer>
-            <ModifyButton>Modifier</ModifyButton>
+            <ModifyButton onClick={() => handleModify(recipe.id)}>Modifier</ModifyButton>
             <DeleteButton onClick={() => handleDelete(recipe.id)}>Supprimer</DeleteButton>
           </ButtonContainer>
         </RecipeCard>

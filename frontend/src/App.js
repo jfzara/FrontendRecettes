@@ -22,13 +22,16 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route
             path="/RecipeList"
-            element={<RecipeList recipes={recipes} />}
+            element={<RecipeList recipes={recipes} setRecipes={setRecipes} />}
           />
           <Route
             path="/AddRecipe"
             element={<AddRecipe recipes={recipes} setRecipes={setRecipes} />}
           />
-          <Route path="/EditRecipe" element={<EditRecipe />} />
+          <Route
+            path="/EditRecipe/:id"
+            element={<EditRecipe recipes={recipes} setRecipes={setRecipes} />}
+          />
           <Route path="/RecipeDetail" element={<RecipeDetail />} />
         </Routes>
       </AuthProvider>

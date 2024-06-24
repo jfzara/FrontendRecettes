@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const StyledEditForm = styled.div`
@@ -53,31 +54,97 @@ const StyledButton = styled.button`
   }
 `;
 
-const EditRecipe = () => {
+const EditRecipe = ({ recipes, setRecipes }) => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [recipeData, setRecipeData] = useState({
+    recipeName: '',
+    ingredients: '',
+    instructions: '',
+    category: '',
+    imageUrl: '',
+  });
+
+  useEffect(() => {
+    if (recipes && recipes.length > 0) {
+      const recipeToEdit = recipes.find(recipe => recipe.id === parseInt(id));
+      if (recipeToEdit) {
+        setRecipeData(recipeToEdit);
+      }
+    }
+  }, [id, recipes]);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setRecipeData({ ...recipeData, [id]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const updatedRecipes = recipes.map(recipe =>
+      recipe.id === parseInt(id) ? recipeData : recipe
+    );
+    setRecipes(updatedRecipes);
+    navigate('/RecipeList');
+  };
+
   return (
     <StyledEditForm>
-    <h2>Modifier la Recette</h2>
-    <StyledForm>
-      <StyledLabel htmlFor="title">Nom de la recette :</StyledLabel>
-      <StyledInput type="text" id="title" value="Pizza" disabled />
-  
-      <StyledLabel htmlFor="ingredients">Ingrédients :</StyledLabel>
-      <StyledTextarea id="ingredients" value="Tomate, Fromage, Pâte" disabled />
-  
-      <StyledLabel htmlFor="instructions">Instructions :</StyledLabel>
-      <StyledTextarea id="instructions" value="1. Préchauffer le four à 220°C. 2. Étaler la pâte..." disabled />
-  
-      <StyledLabel htmlFor="category">Catégorie :</StyledLabel>
-      <StyledSelect id="category" disabled>
-        <option value="Plat" selected>Plat</option>
-      </StyledSelect>
-  
-      <StyledLabel htmlFor="imageUrl">URL de l'image :</StyledLabel>
-      <StyledInput type="text" id="imageUrl" value="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa-YrEBAHHFG8fOs335Iu2p0KlTeDdHnhDlg&s" disabled />
-  
-      <StyledButton type="button">Modifier la Recette</StyledButton>
-    </StyledForm>
-  </StyledEditForm>
+      <h2>Modifier la Recette</h2>
+      <StyledForm onSubmit={handleSubmit}>
+        <StyledLabel htmlFor="recipeName">Nom de la recette :</StyledLabel>
+        <StyledInput
+          type="text"
+          id="recipeName"
+          value={recipeData.recipeName}
+          onChange={handleChange}
+          required
+        />
+
+        <StyledLabel htmlFor="ingredients">Ingrédients :</StyledLabel>
+        <StyledTextarea
+          id="ingredients"
+          value={recipeData.ingredients}
+          onChange={handleChange}
+          rows="4"
+          required
+        />
+
+        <StyledLabel htmlFor="instructions">Instructions :</StyledLabel>
+        <StyledTextarea
+          id="instructions"
+          value={recipeData.instructions}
+          onChange={handleChange}
+          rows="4"
+          required
+        />
+
+        <StyledLabel htmlFor="category">Catégorie :</StyledLabel>
+        <StyledSelect
+          id="category"
+          value={recipeData.category}
+          onChange={handleChange}
+          required
+        >
+          <option value="" disabled>Choisir catégorie</option>
+          <option value="entrée">Entrée</option>
+          <option value="plat">Plat</option>
+          <option value="dessert">Dessert</option>
+          <option value="boisson">Boisson</option>
+          <option value="autre">Autre</option>
+        </StyledSelect>
+
+        <StyledLabel htmlFor="imageUrl">URL de l'image :</StyledLabel>
+        <StyledInput
+          type="text"
+          id="imageUrl"
+          value={recipeData.imageUrl}
+          onChange={handleChange}
+        />
+
+        <StyledButton type="submit">Modifier la Recette</StyledButton>
+      </StyledForm>
+    </StyledEditForm>
   );
 };
 
