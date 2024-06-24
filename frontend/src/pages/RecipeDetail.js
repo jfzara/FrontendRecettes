@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 const StyledRecipeDetail = styled.div`
@@ -43,23 +44,21 @@ const RecipeInstructions = styled.p`
   margin-bottom: 8px;
 `;
 
-const RecipeDetail = () => {
-  // Exemple de données de recette (à remplacer par vos données réelles)
-  const recipe = {
-    title: 'Pizza',
-    category: 'Plat',
-    ingredients: 'Tomate, Fromage, Pâte',
-    instructions: '1. Préchauffer le four à 220°C. 2. Étaler la pâte...',
-    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa-YrEBAHHFG8fOs335Iu2p0KlTeDdHnhDlg&s', // URL de l'image de la recette
-  };
+const RecipeDetail = ({ recipes }) => {
+  const { id } = useParams();
+  const recipe = recipes.find((recipe) => recipe.id === parseInt(id));
+
+  if (!recipe) {
+    return <p>Recette non trouvée.</p>;
+  }
 
   return (
     <StyledRecipeDetail>
       <h2>Détails de la Recette</h2>
       <RecipeCard>
-        <RecipeImage src={recipe.imageUrl} alt={recipe.title} />
+        <RecipeImage src={recipe.imageUrl} alt={recipe.recipeName} />
         <RecipeDetails>
-          <RecipeTitle>{recipe.title}</RecipeTitle>
+          <RecipeTitle>{recipe.recipeName}</RecipeTitle>
           <RecipeCategory><strong>Catégorie:</strong> {recipe.category}</RecipeCategory>
           <RecipeIngredients><strong>Ingrédients:</strong> {recipe.ingredients}</RecipeIngredients>
           <RecipeInstructions><strong>Instructions:</strong> {recipe.instructions}</RecipeInstructions>

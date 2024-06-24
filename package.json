@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/jfzara/FrontendRecettes/issues"
   },
-  "homepage": "https://github.com/jfzara/FrontendRecettes#readme"
+  "homepage": "https://github.com/jfzara/FrontendRecettes#readme",
+  "dependencies": {
+    "react-router-dom": "^6.23.1"
+  }
 }

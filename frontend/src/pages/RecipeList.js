@@ -28,7 +28,7 @@ const RecipeCard = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 20px;
-  padding-bottom: 1rem; /* Ajouter le padding-bottom */
+  padding-bottom: 1rem;
 `;
 
 const RecipeImage = styled.img`
@@ -55,6 +55,15 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
   padding: 0 10px 10px 10px;
   margin-bottom: 1rem;
+`;
+
+const DetailButton = styled.button`
+  background-color: lightgrey;
+  color: black;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
 `;
 
 const ModifyButton = styled.button`
@@ -89,6 +98,10 @@ const RecipeList = ({ recipes, setRecipes }) => {
     navigate(`/EditRecipe/${id}`);
   };
 
+  const handleViewDetail = (id) => {
+    navigate(`/RecipeDetail/${id}`);
+  };
+
   return (
     <StyledRecipeList>
       <h2>Liste des Recettes</h2>
@@ -102,6 +115,7 @@ const RecipeList = ({ recipes, setRecipes }) => {
             <RecipeCategory>{recipe.category}</RecipeCategory>
           </RecipeDetails>
           <ButtonContainer>
+            <DetailButton onClick={() => handleViewDetail(recipe.id)}>Détails</DetailButton>
             <ModifyButton onClick={() => handleModify(recipe.id)}>Modifier</ModifyButton>
             <DeleteButton onClick={() => handleDelete(recipe.id)}>Supprimer</DeleteButton>
           </ButtonContainer>

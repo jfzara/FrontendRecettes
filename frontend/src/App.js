@@ -20,19 +20,10 @@ const App = () => {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/RecipeList"
-            element={<RecipeList recipes={recipes} setRecipes={setRecipes} />}
-          />
-          <Route
-            path="/AddRecipe"
-            element={<AddRecipe recipes={recipes} setRecipes={setRecipes} />}
-          />
-          <Route
-            path="/EditRecipe/:id"
-            element={<EditRecipe recipes={recipes} setRecipes={setRecipes} />}
-          />
-          <Route path="/RecipeDetail" element={<RecipeDetail />} />
+          <Route path="/RecipeList" element={<RecipeList recipes={recipes} setRecipes={setRecipes} />} />
+          <Route path="/AddRecipe" element={<AddRecipe recipes={recipes} setRecipes={setRecipes} />} />
+          <Route path="/EditRecipe/:id" element={<EditRecipe recipes={recipes} setRecipes={setRecipes} />} />
+          <Route path="/RecipeDetail/:id" element={<RecipeDetail recipes={recipes} />} />
         </Routes>
       </AuthProvider>
     </Router>
