@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const StyledAddRecipeForm = styled.div`
   width: 400px;
@@ -77,7 +78,9 @@ const AddRecipe = ({ recipes, setRecipes }) => {
     e.preventDefault();
     const newRecipe = { ...recipeData, id: recipes.length + 1 }; // Adding an ID
     setRecipes([...recipes, newRecipe]);
-    toast.success('Recette ajoutée avec succès!'); // Notification
+    toast.success('Recette ajoutée avec succès!', {
+      position: toast.POSITION.BOTTOM_RIGHT,
+    });
     setRecipeData({
       recipeName: '',
       ingredients: '',

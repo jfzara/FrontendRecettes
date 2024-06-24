@@ -58,15 +58,20 @@ const Login = () => {
     const { username, password } = formData;
     const isAuthenticated = login(username, password);
     if (isAuthenticated) {
-      toast.success('Connecté avec succès!');
+      toast.success('Connecté avec succès!', {
+        position: toast.POSITION.BOTTOM_CENTER, // Définit la position en bas au centre
+        autoClose: 3000, // Ferme automatiquement après 3 secondes
+      });
     } else {
-      toast.error('Échec de la connexion');
+      toast.error('Échec de la connexion', {
+        position: toast.POSITION.BOTTOM_CENTER, // Définit la position en bas au centre
+        autoClose: 3000, // Ferme automatiquement après 3 secondes
+      });
     }
   };
 
   return (
     <StyledLoginForm>
-      <ToastContainer />
       <h2>Connexion</h2>
       <StyledForm onSubmit={handleSubmit}>
         <StyledLabel htmlFor="username">Nom d'utilisateur:</StyledLabel>
@@ -77,6 +82,7 @@ const Login = () => {
 
         <StyledButton type="submit">Se connecter</StyledButton>
       </StyledForm>
+      <ToastContainer position="bottom-center" /> {/* Positionne les toasts en bas au centre */}
     </StyledLoginForm>
   );
 };

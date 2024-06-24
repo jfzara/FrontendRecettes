@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const StyledEditForm = styled.div`
   max-width: 400px;
@@ -31,6 +33,7 @@ const StyledTextarea = styled.textarea`
   margin-bottom: 16px;
   border: 1px solid lightgrey;
   border-radius: 4px;
+  resize: vertical;
 `;
 
 const StyledSelect = styled.select`
@@ -85,6 +88,9 @@ const EditRecipe = ({ recipes, setRecipes }) => {
       recipe.id === parseInt(id) ? recipeData : recipe
     );
     setRecipes(updatedRecipes);
+    toast.success('Recette modifiée avec succès!', {
+      position: toast.POSITION.BOTTOM_RIGHT,
+    });
     navigate('/RecipeList');
   };
 
