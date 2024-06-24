@@ -1,15 +1,13 @@
-import React from 'react';
-import styled from 'styled-components'
-
+import React, { useState } from 'react';
+import styled from 'styled-components';
 
 const StyledRecipeList = styled.div`
- 
   margin: auto;
   padding: 20px;
   display: flex;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 20px; 
+  gap: 20px;
 `;
 
 const SearchBar = styled.input`
@@ -29,7 +27,6 @@ const RecipeCard = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 20px;
-  padding-bottom: 1rem
 `;
 
 const RecipeImage = styled.img`
@@ -76,37 +73,37 @@ const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
+const RecipeList = ({ recipes }) => {
+  // Utiliser le hook useState pour gérer la liste des recettes
+  const [recipeList, setRecipeList] = useState(recipes);
 
-
-const RecipeList = () => {
-    // Exemple de données de recettes (à remplacer par vos données réelles)
-    const recipes = [
-      { id: 1, title: 'Pizza', category: 'Plat', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa-YrEBAHHFG8fOs335Iu2p0KlTeDdHnhDlg&s' },
-      { id: 2, title: 'Salade', category: 'Entrée', imageUrl: 'https://img.passeportsante.net/1200x675/2021-03-02/i100060-salade-de-laitue-concombres-et-tomates.webp' },
-      { id: 3, title: 'Gâteau', category: 'Dessert', imageUrl: 'https://cdn.pixabay.com/photo/2017/01/11/11/33/cake-1971552_1280.jpg' },
-    ];
-  
-    return (
-      <StyledRecipeList>
-        <h2>Liste des Recettes</h2>
-        <SearchBar type="text" placeholder="Rechercher des recettes..." />
-  
-        {recipes.map(recipe => (
-          <RecipeCard key={recipe.id}>
-            <RecipeImage src={recipe.imageUrl} alt={recipe.title} />
-            <RecipeDetails>
-              <RecipeTitle>{recipe.title}</RecipeTitle>
-              <RecipeCategory>{recipe.category}</RecipeCategory>
-            </RecipeDetails>
-            <ButtonContainer>
-              <ModifyButton>Modifier</ModifyButton>
-              <DeleteButton>Supprimer</DeleteButton>
-            </ButtonContainer>
-
-          </RecipeCard>
-        ))}
-      </StyledRecipeList>
-    );
+  // Fonction pour supprimer une recette
+  const handleDelete = (id) => {
+    const updatedRecipes = recipeList.filter(recipe => recipe.id !== id);
+    setRecipeList(updatedRecipes);
+    // Ici, vous pouvez implémenter la logique pour supprimer la recette de votre backend
   };
-  
-  export default RecipeList;
+
+  return (
+    <StyledRecipeList>
+      <h2>Liste des Recettes</h2>
+      <SearchBar type="text" placeholder="Rechercher des recettes..." />
+
+      {recipeList.map((recipe, index) => (
+        <RecipeCard key={index}>
+          <RecipeImage src={recipe.imageUrl} alt={recipe.recipeName} />
+          <RecipeDetails>
+            <RecipeTitle>{recipe.recipeName}</RecipeTitle>
+            <RecipeCategory>{recipe.category}</RecipeCategory>
+          </RecipeDetails>
+          <ButtonContainer>
+            <ModifyButton>Modifier</ModifyButton>
+            <DeleteButton onClick={() => handleDelete(recipe.id)}>Supprimer</DeleteButton>
+          </ButtonContainer>
+        </RecipeCard>
+      ))}
+    </StyledRecipeList>
+  );
+};
+
+export default RecipeList;

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import AuthContext from '../components/AuthContext';
 
 const StyledNavbar = styled.nav`
@@ -24,7 +25,7 @@ const NavbarRight = styled.div`
     padding: 0;
     margin: 0;
     display: flex;
-    gap: 1rem; 
+    gap: 1rem;
   }
 
   li {
@@ -39,6 +40,8 @@ const NavbarRight = styled.div`
 `;
 
 const Navbar = () => {
+  const { isAuthenticated, logout } = useContext(AuthContext); // Récupère l'état d'authentification
+
   return (
     <StyledNavbar className="navbar">
       <NavbarLeft>
@@ -46,10 +49,24 @@ const Navbar = () => {
       </NavbarLeft>
       <NavbarRight>
         <ul>
-          <li><a href="/login">Connexion</a></li>
-          <li><a href="/signup">Inscription</a></li>
+          {!isAuthenticated && (
+            <>
+              <li>
+                <Link to="/login">Connexion</Link>
+              </li>
+              <li>
+                <Link to="/signup">Inscription</Link>
+              </li>
+            </>
+          )}
+          {isAuthenticated && (
+            <li>
+              <button onClick={logout}>Déconnexion</button>
+            </li>
+          )}
         </ul>
       </NavbarRight>
+
     </StyledNavbar>
   );
 };

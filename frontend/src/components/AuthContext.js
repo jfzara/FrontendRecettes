@@ -10,8 +10,8 @@ export const AuthProvider = ({ children }) => {
 
   // Fonction de connexion
   const login = (username, password) => {
-    // Logique d'authentification
-    if (username === 'admin' && password === 'password') { // Remplacez par votre propre logique
+    // Logique d'authentification (exemple simplifié)
+    if (username === 'admin' && password === 'password') {
       setIsAuthenticated(true);
       return true;
     } else {
@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
 
   // Fonction de déconnexion
   const logout = () => {
-    // Logique de déconnexion
     setIsAuthenticated(false);
   };
 
