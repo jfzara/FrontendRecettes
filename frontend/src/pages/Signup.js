@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import AuthContext from '../components/AuthContext';
 
 const StyledSignupForm = styled.div`
   width: 300px;
@@ -102,39 +101,65 @@ const ErrorPopupContainer = styled(PopupContainer)`
 `;
 
 const Signup = () => {
+  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Simulation de l'inscription réussie avec les valeurs en dur
+    if (formData.username === 'admin' && formData.password === 'password') {
+      setShowSuccessPopup(true);
+      setShowErrorPopup(false);
+      // Vous pouvez rediriger l'utilisateur ici ou afficher un message de succès
+    } else {
+      setShowSuccessPopup(false);
+      setShowErrorPopup(true);
+    }
+  };
+
   return (
     <StyledSignupForm>
       <h2>Inscription</h2>
-      <StyledForm>
+      <StyledForm onSubmit={handleSubmit}>
         <StyledLabel htmlFor="username">Nom d'utilisateur:</StyledLabel>
-        <StyledInput type="text" id="username" required />
+        <StyledInput type="text" id="username" value={formData.username} onChange={handleChange} required />
 
         <StyledLabel htmlFor="email">Email:</StyledLabel>
-        <StyledInput type="email" id="email" required />
+        <StyledInput type="email" id="email" value={formData.email} onChange={handleChange} required />
 
         <StyledLabel htmlFor="password">Mot de passe:</StyledLabel>
-        <StyledInput type="password" id="password" required />
+        <StyledInput type="password" id="password" value={formData.password} onChange={handleChange} required />
 
-        <StyledButton type="button">S'inscrire</StyledButton>
+        <StyledButton type="submit">S'inscrire</StyledButton>
       </StyledForm>
 
-      <PopupContainer>
-        <PopupContent>
-          <SuccessIcon>✔</SuccessIcon>
-          <span>Inscription réussie!</span>
-          <CloseButton>&times;</CloseButton>
-        </PopupContent>
-        <BottomBorder />
-      </PopupContainer>
+      {showSuccessPopup && (
+        <PopupContainer>
+          <PopupContent>
+            <SuccessIcon>✔</SuccessIcon>
+            <span>Inscription réussie!</span>
+            <CloseButton onClick={() => setShowSuccessPopup(false)}>&times;</CloseButton>
+          </PopupContent>
+          <BottomBorder />
+        </PopupContainer>
+      )}
 
-      <ErrorPopupContainer>
-        <PopupContent>
-          <ErrorIcon>!</ErrorIcon>
-          <span>Échec de l'inscription</span>
-          <CloseButton>&times;</CloseButton>
-        </PopupContent>
-        <BottomBorder style={{ background: 'linear-gradient(to right, red 75%, lightcoral 25%)' }} />
-      </ErrorPopupContainer>
+      {showErrorPopup && (
+        <ErrorPopupContainer>
+          <PopupContent>
+            <ErrorIcon>!</ErrorIcon>
+            <span>Échec de l'inscription</span>
+            <CloseButton onClick={() => setShowErrorPopup(false)}>&times;</CloseButton>
+          </PopupContent>
+          <BottomBorder style={{ background: 'linear-gradient(to right, red 75%, lightcoral 25%)' }} />
+        </ErrorPopupContainer>
+      )}
     </StyledSignupForm>
   );
 };
