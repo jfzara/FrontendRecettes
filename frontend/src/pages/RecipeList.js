@@ -27,6 +27,7 @@ const RecipeCard = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 20px;
+  padding-bottom: 1rem;  /* Added padding-bottom */
 `;
 
 const RecipeImage = styled.img`
