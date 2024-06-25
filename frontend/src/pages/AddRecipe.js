@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import { Navigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import styled from 'styled-components'; // Importation de styled-components pour la gestion du style CSS
+import { Navigate } from 'react-router-dom'; // Importation de Navigate pour la redirection
+import { toast } from 'react-toastify'; // Importation de toast pour les notifications
+import axios from 'axios'; // Importation d'axios pour les requêtes HTTP (bien que non utilisé ici)
 
+
+
+// Définition du style pour le formulaire d'ajout de recette
 const StyledAddRecipeForm = styled.div`
   width: 400px;
   margin: auto;
@@ -13,15 +16,18 @@ const StyledAddRecipeForm = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
+// Définition du style pour le formulaire
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
 `;
 
+// Définition du style pour les labels
 const StyledLabel = styled.label`
   margin-bottom: 8px;
 `;
 
+// Définition du style pour les inputs
 const StyledInput = styled.input`
   padding: 8px;
   margin-bottom: 16px;
@@ -29,6 +35,7 @@ const StyledInput = styled.input`
   border-radius: 4px;
 `;
 
+// Définition du style pour les textareas
 const StyledTextArea = styled.textarea`
   padding: 8px;
   margin-bottom: 16px;
@@ -37,6 +44,7 @@ const StyledTextArea = styled.textarea`
   resize: vertical;
 `;
 
+// Définition du style pour les selects
 const StyledSelect = styled.select`
   padding: 8px;
   margin-bottom: 16px;
@@ -44,6 +52,7 @@ const StyledSelect = styled.select`
   border-radius: 4px;
 `;
 
+// Définition du style pour les boutons
 const StyledButton = styled.button`
   background-color: blue;
   color: white;
@@ -58,7 +67,9 @@ const StyledButton = styled.button`
   }
 `;
 
+// Composant AddRecipe
 const AddRecipe = ({ recipes, setRecipes }) => {
+  // Déclaration de l'état pour stocker les données de la recette
   const [recipeData, setRecipeData] = useState({
     recipeName: '',
     ingredients: '',
@@ -67,30 +78,31 @@ const AddRecipe = ({ recipes, setRecipes }) => {
     imageUrl: '',
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false); // État pour gérer la soumission du formulaire
 
+  // Fonction pour gérer les changements dans les champs de formulaire
   const handleChange = (e) => {
     const { id, value } = e.target;
     setRecipeData({ ...recipeData, [id]: value });
   };
 
+  // Fonction pour gérer la soumission du formulaire
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newRecipe = { ...recipeData, id: recipes.length + 1 }; // Adding an ID
-    setRecipes([...recipes, newRecipe]);
-    toast.success('Recette ajoutée avec succès!', {
-      position: toast.POSITION.BOTTOM_RIGHT,
-    });
+    const newRecipe = { ...recipeData, id: recipes.length + 1 }; // Ajout d'un ID à la recette
+    setRecipes([...recipes, newRecipe]); // Ajout de la nouvelle recette à la liste des recettes
+    toast.success('Recette ajoutée avec succès!'); // Notification de succès
     setRecipeData({
       recipeName: '',
       ingredients: '',
       instructions: '',
       category: '',
       imageUrl: '',
-    });
-    setSubmitted(true);
+    }); // Réinitialisation des champs du formulaire
+    setSubmitted(true); // Mise à jour de l'état pour indiquer que le formulaire a été soumis
   };
 
+  // Redirection vers la liste des recettes après la soumission du formulaire
   if (submitted) {
     return <Navigate to="/RecipeList" />;
   }
@@ -155,4 +167,4 @@ const AddRecipe = ({ recipes, setRecipes }) => {
   );
 };
 
-export default AddRecipe;
+export default AddRecipe; // Exportation du composant AddRecipe
