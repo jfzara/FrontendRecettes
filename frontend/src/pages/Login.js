@@ -1,40 +1,42 @@
-import React, { useState } from 'react'; // Importation de React et du hook useState
-import styled from 'styled-components'; // Importation de styled-components pour la gestion des styles
-import { toast, ToastContainer } from 'react-toastify'; // Importation de react-toastify pour les notifications
-import 'react-toastify/dist/ReactToastify.css'; // Importation du CSS de react-toastify
-import axios from 'axios'; // Importation d'axios pour les requêtes HTTP
+import React, { useState } from 'react';
+import api from '../api';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import styled from 'styled-components';
 
-// Définition du style pour le conteneur du formulaire de connexion
+// Styles pour le formulaire de connexion
 const StyledLoginForm = styled.div`
-  width: 300px;
-  height: 250px;
+  width: 400px;
   margin: auto;
-  margin-top: 20px;
   padding: 20px;
   border: 1px solid lightgrey;
+  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
 `;
 
-// Définition du style pour le formulaire
+// Styles pour le formulaire
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
 `;
 
-// Définition du style pour les labels
+// Styles pour les étiquettes
 const StyledLabel = styled.label`
   margin-bottom: 8px;
+  font-weight: bold;
 `;
 
-// Définition du style pour les inputs
+// Styles pour les champs de saisie
 const StyledInput = styled.input`
-  padding: 8px;
+  padding: 10px;
   margin-bottom: 16px;
   border: 1px solid lightgrey;
   border-radius: 4px;
+  font-size: 16px;
 `;
 
-// Définition du style pour les boutons
+// Styles pour le bouton
 const StyledButton = styled.button`
   background-color: blue;
   color: white;
@@ -43,65 +45,60 @@ const StyledButton = styled.button`
   cursor: pointer;
   font-size: 16px;
   border-radius: 4px;
+  transition: background-color 0.3s;
 
   &:hover {
     background-color: darkblue;
   }
 `;
 
-// Composant Login
+// Composant Login pour se connecter à l'application
 const Login = () => {
-  // État local pour stocker les données du formulaire
-  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [username, setUsername] = useState(''); // État pour le nom d'utilisateur
+  const [password, setPassword] = useState(''); // État pour le mot de passe
+  const { login } = useAuth(); // Récupérer la fonction login du contexte d'authentification
+  const navigate = useNavigate(); // Utiliser pour naviguer après la connexion
 
-  // Fonction pour gérer les changements dans les champs de formulaire
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value }); // Mise à jour de l'état avec les nouvelles valeurs
-  };
-
-  // Fonction pour gérer la soumission du formulaire
+  // Fonction de gestion de la soumission du formulaire
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Empêche le comportement par défaut du formulaire
-
+    e.preventDefault(); // Empêcher le comportement par défaut du formulaire
     try {
-      const response = await axios.post('http://localhost:3000/api/users/login', formData); // Envoi d'une requête POST au backend avec les données du formulaire
-      console.log(response.data); // Affichage de la réponse du backend si nécessaire
-      toast.success('Connexion réussie!'); // Notification de succès
-      // Redirection ou message de succès ici
+      const response = await api.post('/users/login', { username, password });
+      console.log(response.data); // Afficher la réponse de l'API dans la console
+      login(); // Mettre à jour l'état d'authentification
+      navigate('/recipes'); // Rediriger vers la liste des recettes après la connexion
     } catch (error) {
-      console.error('Erreur lors de la connexion :', error); // Affichage de l'erreur dans la console
-      toast.error('Échec de la connexion'); // Notification d'échec
+      console.error('Login failed:', error); // Afficher l'erreur en cas d'échec
     }
   };
 
+  // Rendu du formulaire de connexion
   return (
     <StyledLoginForm>
-      <ToastContainer /> {/* Conteneur pour les notifications */}
-      <h2>Connexion</h2>
+      <h2>Login</h2>
       <StyledForm onSubmit={handleSubmit}>
-        <StyledLabel htmlFor="username">Nom d'utilisateur:</StyledLabel>
+        <StyledLabel htmlFor="username">Username:</StyledLabel>
         <StyledInput
           type="text"
           id="username"
-          value={formData.username}
-          onChange={handleChange}
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
-
-        <StyledLabel htmlFor="password">Mot de passe:</StyledLabel>
+        <StyledLabel htmlFor="password">Password:</StyledLabel>
         <StyledInput
           type="password"
           id="password"
-          value={formData.password}
-          onChange={handleChange}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
-
-        <StyledButton type="submit">Se connecter</StyledButton>
+        <StyledButton type="submit">Login</StyledButton>
       </StyledForm>
     </StyledLoginForm>
   );
 };
 
-export default Login; // Exportation du composant Login
+export default Login; // Exporter le composant pour l'utiliser ailleurs

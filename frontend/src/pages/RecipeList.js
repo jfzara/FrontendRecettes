@@ -1,139 +1,134 @@
-import React from 'react'; // Importation de React pour créer des composants
-import styled from 'styled-components'; // Importation de styled-components pour la gestion des styles
-import { useNavigate } from 'react-router-dom'; // Importation de useNavigate pour la navigation programmatique
-import { toast } from 'react-toastify'; // Importation de toast pour les notifications
-import axios from 'axios'; // Importation d'axios pour les requêtes HTTP (potentiellement utile pour des fonctionnalités futures)
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../api';
+import styled from 'styled-components';
 
-// Définition du style pour le conteneur principal de la liste des recettes
-const StyledRecipeList = styled.div`
-  margin: auto;
+// Styled components pour structurer et styliser les éléments de la page de liste des recettes
+const Container = styled.div`
   padding: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
 `;
 
-// Définition du style pour la barre de recherche
+const Title = styled.h1`
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
 const SearchBar = styled.input`
   width: 100%;
   padding: 10px;
   margin-bottom: 20px;
   border: 1px solid lightgrey;
   border-radius: 4px;
-  font-size: 16px;
 `;
 
-// Définition du style pour chaque carte de recette
+const RecipeGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+`;
+
 const RecipeCard = styled.div`
-  width: 100%;
-  max-width: 400px;
-  height: 300px;
+  border: 1px solid lightgrey;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
-// Définition du style pour l'image de la recette
 const RecipeImage = styled.img`
   width: 100%;
-  height: 55%;
+  height: 150px;
   object-fit: cover;
 `;
 
-// Définition du style pour la section des détails de la recette
 const RecipeDetails = styled.div`
   padding: 10px;
 `;
 
-// Définition du style pour le titre de la recette
-const RecipeTitle = styled.h3`
-  font-weight: bold;
-  margin-bottom: 8px;
+const RecipeTitle = styled.h2`
+  margin: 0 0 10px;
+  font-size: 18px;
 `;
 
-// Définition du style pour la catégorie de la recette
 const RecipeCategory = styled.p`
-  margin-bottom: 8px;
+  margin: 0 0 10px;
+  color: grey;
 `;
 
-// Définition du style pour le conteneur des boutons
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 0 10px 10px 10px;
-  margin-bottom: 1rem;
-`;
-
-// Définition du style pour le bouton de modification
-const ModifyButton = styled.button`
-  background-color: yellow;
-  color: black;
-  border: none;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-`;
-
-// Définition du style pour le bouton de suppression
-const DeleteButton = styled.button`
-  background-color: red;
+const ActionButton = styled.button`
+  background-color: ${props => props.delete ? 'red' : 'blue'};
   color: white;
   border: none;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 10px;
   cursor: pointer;
+  width: 100%;
+  border-top: 1px solid lightgrey;
+
+  &:hover {
+    background-color: ${props => props.delete ? 'darkred' : 'darkblue'};
+  }
 `;
 
-// Définition du style pour le bouton de détails
-const DetailButton = styled.button`
-  background-color: lightgrey;
-  color: black;
-  border: none;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-`;
+// Composant principal pour afficher la liste des recettes
+const RecipeList = () => {
+  const [recipes, setRecipes] = useState([]); // État local pour stocker les recettes
+  const [searchTerm, setSearchTerm] = useState(''); // État local pour stocker le terme de recherche
+  const navigate = useNavigate();
 
-// Composant RecipeList pour afficher la liste des recettes
-const RecipeList = ({ recipes, setRecipes }) => {
-  const navigate = useNavigate(); // Utilisation de useNavigate pour naviguer vers d'autres pages
+  useEffect(() => {
+    // Fonction pour récupérer les recettes depuis l'API
+    const fetchRecipes = async () => {
+      try {
+        const response = await api.get('/recipes'); // Requête API pour obtenir les recettes
+        setRecipes(response.data); // Mettre à jour l'état avec les données des recettes
+      } catch (error) {
+        console.error('Error fetching recipes:', error); // Gérer les erreurs éventuelles
+      }
+    };
+    fetchRecipes(); // Appel de la fonction pour récupérer les recettes
+  }, []);
 
-  // Fonction pour gérer la suppression d'une recette
-  const handleDelete = (id) => {
-    const updatedRecipes = recipes.filter(recipe => recipe.id !== id); // Filtrer les recettes pour exclure celle avec l'id donné
-    setRecipes(updatedRecipes); // Mettre à jour l'état des recettes
-    toast.success('Recette supprimée avec succès!'); // Afficher une notification de succès
+  // Fonction pour supprimer une recette
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/recipes/${id}`); // Requête API pour supprimer la recette
+      setRecipes(recipes.filter(recipe => recipe.id !== id)); // Mettre à jour l'état pour retirer la recette supprimée
+    } catch (error) {
+      console.error('Error deleting recipe:', error); // Gérer les erreurs éventuelles
+    }
   };
 
-  // Fonction pour gérer la navigation vers les détails d'une recette
-  const handleDetail = (id) => {
-    navigate(`/RecipeDetail/${id}`); // Naviguer vers la page des détails de la recette
-  };
+  // Filtrer les recettes en fonction du terme de recherche
+  const filteredRecipes = recipes.filter(recipe =>
+    recipe.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // Retourne la liste des recettes sous forme de cartes
   return (
-    <StyledRecipeList>
-      <h2>Liste des Recettes</h2>
-      <SearchBar type="text" placeholder="Rechercher des recettes..." /> {/* Barre de recherche */}
-
-      {recipes.map((recipe) => ( // Parcourir la liste des recettes
-        <RecipeCard key={recipe.id}> {/* Carte de recette avec clé unique */}
-          <RecipeImage src={recipe.imageUrl} alt={recipe.title} /> {/* Affichage de l'image de la recette */}
-          <RecipeDetails>
-            <RecipeTitle>{recipe.recipeName}</RecipeTitle> {/* Affichage du titre de la recette */}
-            <RecipeCategory><strong>Catégorie:</strong> {recipe.category}</RecipeCategory> {/* Affichage de la catégorie */}
-            <ButtonContainer>
-              <ModifyButton onClick={() => navigate(`/EditRecipe/${recipe.id}`)}>Modifier</ModifyButton> {/* Bouton de modification */}
-              <DeleteButton onClick={() => handleDelete(recipe.id)}>Supprimer</DeleteButton> {/* Bouton de suppression */}
-              <DetailButton onClick={() => handleDetail(recipe.id)}>Détails</DetailButton> {/* Bouton de détails */}
-            </ButtonContainer>
-          </RecipeDetails>
-        </RecipeCard>
-      ))}
-    </StyledRecipeList>
+    <Container>
+      <Title>Mes Recettes</Title> {/* Titre de la page */}
+      <SearchBar
+        type="text"
+        placeholder="Rechercher des recettes..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      /> {/* Barre de recherche */}
+      <RecipeGrid>
+        {filteredRecipes.map(recipe => (
+          <RecipeCard key={recipe.id}>
+            <Link to={`/recipes/${recipe.id}`}>
+              <RecipeImage src={recipe.imageUrl} alt={recipe.name} /> {/* Image de la recette */}
+            </Link>
+            <RecipeDetails>
+              <RecipeTitle>{recipe.name}</RecipeTitle> {/* Nom de la recette */}
+              <RecipeCategory>{recipe.category}</RecipeCategory> {/* Catégorie de la recette */}
+              <ActionButton onClick={() => navigate(`/edit-recipe/${recipe.id}`)}>Modifier</ActionButton> {/* Bouton pour modifier la recette */}
+              <ActionButton delete onClick={() => handleDelete(recipe.id)}>Supprimer</ActionButton> {/* Bouton pour supprimer la recette */}
+            </RecipeDetails>
+          </RecipeCard>
+        ))}
+      </RecipeGrid>
+    </Container>
   );
 };
 
-export default RecipeList; // Exportation du composant RecipeList
+export default RecipeList; // Exporter le composant pour l'utiliser dans d'autres parties de l'application
+

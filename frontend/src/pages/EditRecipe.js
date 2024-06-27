@@ -1,53 +1,52 @@
-import React, { useState, useEffect } from 'react'; // Importation des hooks useState et useEffect de React
-import { useParams, useNavigate } from 'react-router-dom'; // Importation des hooks de react-router-dom pour la navigation
-import styled from 'styled-components'; // Importation de styled-components pour la gestion du style CSS
-import axios from 'axios'; // Importation d'axios pour les requêtes HTTP (bien que non utilisé ici)
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { useParams, useNavigate } from 'react-router-dom';
+import api from '../api';
 
-// Définition du style pour le conteneur de formulaire de modification
+// Styles pour le formulaire d'édition
 const StyledEditForm = styled.div`
-  max-width: 400px;
-  margin: auto;
+  width: 400px;
+  margin: 50px auto;
   padding: 20px;
   border: 1px solid lightgrey;
+  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
 `;
 
-// Définition du style pour le formulaire
+// Styles pour le formulaire
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
 `;
 
-// Définition du style pour les labels
+// Styles pour les étiquettes
 const StyledLabel = styled.label`
   margin-bottom: 8px;
 `;
 
-// Définition du style pour les inputs
+// Styles pour les champs de saisie
 const StyledInput = styled.input`
+  width: calc(100% - 16px);
   padding: 8px;
   margin-bottom: 16px;
-  border: 1px solid lightgrey;
+  border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 16px;
 `;
 
-// Définition du style pour les textareas
-const StyledTextarea = styled.textarea`
+// Styles pour les zones de texte
+const StyledTextArea = styled.textarea`
+  width: calc(100% - 16px);
   padding: 8px;
   margin-bottom: 16px;
-  border: 1px solid lightgrey;
+  border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 16px;
+  resize: vertical;
 `;
 
-// Définition du style pour les selects
-const StyledSelect = styled.select`
-  padding: 8px;
-  margin-bottom: 16px;
-  border: 1px solid lightgrey;
-  border-radius: 4px;
-`;
-
-// Définition du style pour les boutons
+// Styles pour le bouton
 const StyledButton = styled.button`
   background-color: blue;
   color: white;
@@ -62,102 +61,99 @@ const StyledButton = styled.button`
   }
 `;
 
-// Composant EditRecipe
-const EditRecipe = ({ recipes, setRecipes }) => {
-  const { id } = useParams(); // Récupération de l'ID de la recette à modifier depuis l'URL
-  const navigate = useNavigate(); // Hook pour naviguer vers une autre page
-  const [recipeData, setRecipeData] = useState({
-    recipeName: '',
-    ingredients: '',
-    instructions: '',
-    category: '',
-    imageUrl: '',
-  }); // État local pour stocker les données de la recette à modifier
+// Composant EditRecipe pour modifier une recette existante
+const EditRecipe = () => {
+  const { id } = useParams(); // Récupérer l'ID de la recette depuis l'URL
+  const [name, setName] = useState(''); // État pour le nom de la recette
+  const [ingredients, setIngredients] = useState(''); // État pour les ingrédients
+  const [instructions, setInstructions] = useState(''); // État pour les instructions
+  const [category, setCategory] = useState(''); // État pour la catégorie
+  const [imageUrl, setImageUrl] = useState(''); // État pour l'URL de l'image
+  const navigate = useNavigate(); // Utiliser pour naviguer vers une autre page
 
-  // useEffect pour charger les données de la recette à modifier lorsqu'on a l'ID et la liste des recettes
+  // Effect pour récupérer les détails de la recette à éditer
   useEffect(() => {
-    if (recipes && recipes.length > 0) {
-      const recipeToEdit = recipes.find(recipe => recipe.id === parseInt(id)); // Recherche de la recette par ID
-      if (recipeToEdit) {
-        setRecipeData(recipeToEdit); // Mise à jour de l'état avec les données de la recette
+    const fetchRecipe = async () => {
+      try {
+        const response = await api.get(`/recipes/${id}`);
+        const { name, ingredients, instructions, category, imageUrl } = response.data;
+        setName(name); // Mettre à jour l'état avec les données récupérées
+        setIngredients(ingredients);
+        setInstructions(instructions);
+        setCategory(category);
+        setImageUrl(imageUrl);
+      } catch (error) {
+        console.error(error); // Afficher l'erreur en cas d'échec
       }
+    };
+    fetchRecipe();
+  }, [id]); // Exécuter l'effect à chaque changement de l'ID
+
+  // Fonction de gestion de la soumission du formulaire
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Empêcher le rechargement de la page
+    try {
+      await api.put(`/recipes/${id}`, { name, ingredients, instructions, category, imageUrl });
+      navigate('/recipes'); // Rediriger vers la liste des recettes après modification
+    } catch (error) {
+      console.error(error); // Afficher l'erreur en cas d'échec
     }
-  }, [id, recipes]); // Dépendances du useEffect
-
-  // Fonction pour gérer les changements dans les champs de formulaire
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setRecipeData({ ...recipeData, [id]: value }); // Mise à jour de l'état avec les nouvelles valeurs
   };
 
-  // Fonction pour gérer la soumission du formulaire
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const updatedRecipes = recipes.map(recipe =>
-      recipe.id === parseInt(id) ? recipeData : recipe
-    ); // Mise à jour de la liste des recettes avec la recette modifiée
-    setRecipes(updatedRecipes); // Mise à jour de l'état des recettes dans le parent
-    navigate('/RecipeList'); // Navigation vers la liste des recettes
-  };
-
+  // Rendu du formulaire d'édition
   return (
     <StyledEditForm>
       <h2>Modifier la Recette</h2>
       <StyledForm onSubmit={handleSubmit}>
-        <StyledLabel htmlFor="recipeName">Nom de la recette :</StyledLabel>
+        <StyledLabel htmlFor="name">Nom de la recette :</StyledLabel>
         <StyledInput
           type="text"
-          id="recipeName"
-          value={recipeData.recipeName}
-          onChange={handleChange}
+          id="name"
+          placeholder="Nom"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
         />
-
         <StyledLabel htmlFor="ingredients">Ingrédients :</StyledLabel>
-        <StyledTextarea
+        <StyledTextArea
           id="ingredients"
-          value={recipeData.ingredients}
-          onChange={handleChange}
+          placeholder="Ingrédients"
+          value={ingredients}
+          onChange={(e) => setIngredients(e.target.value)}
           rows="4"
           required
         />
-
         <StyledLabel htmlFor="instructions">Instructions :</StyledLabel>
-        <StyledTextarea
+        <StyledTextArea
           id="instructions"
-          value={recipeData.instructions}
-          onChange={handleChange}
+          placeholder="Instructions"
+          value={instructions}
+          onChange={(e) => setInstructions(e.target.value)}
           rows="4"
           required
         />
-
         <StyledLabel htmlFor="category">Catégorie :</StyledLabel>
-        <StyledSelect
+        <StyledInput
+          type="text"
           id="category"
-          value={recipeData.category}
-          onChange={handleChange}
+          placeholder="Catégorie"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
           required
-        >
-          <option value="" disabled>Choisir catégorie</option>
-          <option value="entrée">Entrée</option>
-          <option value="plat">Plat</option>
-          <option value="dessert">Dessert</option>
-          <option value="boisson">Boisson</option>
-          <option value="autre">Autre</option>
-        </StyledSelect>
-
+        />
         <StyledLabel htmlFor="imageUrl">URL de l'image :</StyledLabel>
         <StyledInput
           type="text"
           id="imageUrl"
-          value={recipeData.imageUrl}
-          onChange={handleChange}
+          placeholder="URL de l'image"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+          required
         />
-
         <StyledButton type="submit">Modifier la Recette</StyledButton>
       </StyledForm>
     </StyledEditForm>
   );
 };
 
-export default EditRecipe; // Exportation du composant EditRecipe
+export default EditRecipe; // Exporter le composant pour l'utiliser ailleurs

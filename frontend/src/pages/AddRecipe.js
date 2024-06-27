@@ -1,170 +1,116 @@
-import React, { useState } from 'react';
-import styled from 'styled-components'; // Importation de styled-components pour la gestion du style CSS
-import { Navigate } from 'react-router-dom'; // Importation de Navigate pour la redirection
-import { toast } from 'react-toastify'; // Importation de toast pour les notifications
-import axios from 'axios'; // Importation d'axios pour les requêtes HTTP (bien que non utilisé ici)
+import React, { useState } from 'react'; // Importer React et useState pour gérer les états locaux
+import styled from 'styled-components'; // Importer styled-components pour le style CSS en JS
+import api from '../api'; // Importer l'instance API configurée
+import { useNavigate } from 'react-router-dom'; // Importer useNavigate pour la navigation
 
-
-
-// Définition du style pour le formulaire d'ajout de recette
-const StyledAddRecipeForm = styled.div`
-  width: 400px;
-  margin: auto;
+// Styles pour le formulaire
+const StyledForm = styled.form`
+  max-width: 400px;
+  margin: 50px auto;
   padding: 20px;
-  border: 1px solid lightgrey;
+  border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
 `;
 
-// Définition du style pour le formulaire
-const StyledForm = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-// Définition du style pour les labels
-const StyledLabel = styled.label`
-  margin-bottom: 8px;
-`;
-
-// Définition du style pour les inputs
+// Styles pour les champs d'entrée
 const StyledInput = styled.input`
+  width: calc(100% - 16px);
   padding: 8px;
   margin-bottom: 16px;
-  border: 1px solid lightgrey;
+  border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 16px;
 `;
 
-// Définition du style pour les textareas
-const StyledTextArea = styled.textarea`
-  padding: 8px;
-  margin-bottom: 16px;
-  border: 1px solid lightgrey;
-  border-radius: 4px;
-  resize: vertical;
-`;
-
-// Définition du style pour les selects
-const StyledSelect = styled.select`
-  padding: 8px;
-  margin-bottom: 16px;
-  border: 1px solid lightgrey;
-  border-radius: 4px;
-`;
-
-// Définition du style pour les boutons
+// Styles pour le bouton
 const StyledButton = styled.button`
-  background-color: blue;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
   color: white;
   border: none;
-  padding: 10px;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  border-radius: 4px;
-
+  
   &:hover {
-    background-color: darkblue;
+    background-color: #0056b3;
   }
 `;
 
-// Composant AddRecipe
-const AddRecipe = ({ recipes, setRecipes }) => {
-  // Déclaration de l'état pour stocker les données de la recette
-  const [recipeData, setRecipeData] = useState({
-    recipeName: '',
-    ingredients: '',
-    instructions: '',
-    category: '',
-    imageUrl: '',
-  });
+// Composant AddRecipe pour ajouter une nouvelle recette
+const AddRecipe = () => {
+  // États pour chaque champ du formulaire
+  const [name, setName] = useState('');
+  const [ingredients, setIngredients] = useState('');
+  const [instructions, setInstructions] = useState('');
+  const [category, setCategory] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const navigate = useNavigate(); // pour naviguer vers une autre page
 
-  const [submitted, setSubmitted] = useState(false); // État pour gérer la soumission du formulaire
-
-  // Fonction pour gérer les changements dans les champs de formulaire
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setRecipeData({ ...recipeData, [id]: value });
+  // Fonction de gestion de la soumission du formulaire
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Empêcher le rechargement de la page
+    try {
+      // Envoyer une requête POST à l'API pour créer une nouvelle recette
+      const response = await api.post('/recipes', {
+        name,
+        ingredients,
+        instructions,
+        category,
+        imageUrl,
+      });
+      console.log(response.data); // Afficher la réponse dans la console
+      navigate('/recipes'); // Rediriger vers la liste des recettes après l'ajout
+    } catch (error) {
+      console.error('Error creating recipe:', error); // Afficher l'erreur en cas d'échec
+    }
   };
 
-  // Fonction pour gérer la soumission du formulaire
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newRecipe = { ...recipeData, id: recipes.length + 1 }; // Ajout d'un ID à la recette
-    setRecipes([...recipes, newRecipe]); // Ajout de la nouvelle recette à la liste des recettes
-    toast.success('Recette ajoutée avec succès!'); // Notification de succès
-    setRecipeData({
-      recipeName: '',
-      ingredients: '',
-      instructions: '',
-      category: '',
-      imageUrl: '',
-    }); // Réinitialisation des champs du formulaire
-    setSubmitted(true); // Mise à jour de l'état pour indiquer que le formulaire a été soumis
-  };
-
-  // Redirection vers la liste des recettes après la soumission du formulaire
-  if (submitted) {
-    return <Navigate to="/RecipeList" />;
-  }
-
+  // Rendu du formulaire
   return (
-    <StyledAddRecipeForm>
+    <StyledForm onSubmit={handleSubmit}>
       <h2>Ajouter une recette</h2>
-      <StyledForm onSubmit={handleSubmit}>
-        <StyledLabel htmlFor="recipeName">Nom recette:</StyledLabel>
-        <StyledInput
-          type="text"
-          id="recipeName"
-          value={recipeData.recipeName}
-          onChange={handleChange}
-          required
-        />
-
-        <StyledLabel htmlFor="ingredients">Ingrédients:</StyledLabel>
-        <StyledTextArea
-          id="ingredients"
-          value={recipeData.ingredients}
-          onChange={handleChange}
-          rows="4"
-          required
-        />
-
-        <StyledLabel htmlFor="instructions">Instructions:</StyledLabel>
-        <StyledTextArea
-          id="instructions"
-          value={recipeData.instructions}
-          onChange={handleChange}
-          rows="4"
-          required
-        />
-
-        <StyledLabel htmlFor="category">Catégorie:</StyledLabel>
-        <StyledSelect
-          id="category"
-          value={recipeData.category}
-          onChange={handleChange}
-          required
-        >
-          <option value="" disabled>Choisir catégorie</option>
-          <option value="entrée">Entrée</option>
-          <option value="plat">Plat</option>
-          <option value="dessert">Dessert</option>
-          <option value="boisson">Boisson</option>
-          <option value="autre">Autre</option>
-        </StyledSelect>
-
-        <StyledLabel htmlFor="imageUrl">Image URL:</StyledLabel>
-        <StyledInput
-          type="text"
-          id="imageUrl"
-          value={recipeData.imageUrl}
-          onChange={handleChange}
-        />
-
-        <StyledButton type="submit">Ajouter recette</StyledButton>
-      </StyledForm>
-    </StyledAddRecipeForm>
+      <StyledInput
+        type="text"
+        placeholder="Nom"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+      <StyledInput
+        type="text"
+        placeholder="Ingrédients"
+        value={ingredients}
+        onChange={(e) => setIngredients(e.target.value)}
+        required
+      />
+      <StyledInput
+        type="text"
+        placeholder="Instructions"
+        value={instructions}
+        onChange={(e) => setInstructions(e.target.value)}
+        required
+      />
+      <StyledInput
+        type="text"
+        placeholder="Catégorie"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        required
+      />
+      <StyledInput
+        type="text"
+        placeholder="URL de l'image"
+        value={imageUrl}
+        onChange={(e) => setImageUrl(e.target.value)}
+        required
+      />
+      <StyledButton type="submit">Ajouter la recette</StyledButton>
+    </StyledForm>
   );
 };
 
-export default AddRecipe; // Exportation du composant AddRecipe
+export default AddRecipe; // Exporter le composant pour l'utiliser ailleurs

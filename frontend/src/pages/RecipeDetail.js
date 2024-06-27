@@ -1,83 +1,77 @@
-import React from 'react'; // Importation de React pour créer des composants
-import { useParams } from 'react-router-dom'; // Importation de useParams pour accéder aux paramètres de l'URL
-import styled from 'styled-components'; // Importation de styled-components pour la gestion des styles
-import axios from 'axios'; // Importation d'axios pour les requêtes HTTP
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '../api';
+import styled from 'styled-components';
 
-// Définition du style pour le conteneur principal des détails de la recette
-const StyledRecipeDetail = styled.div`
+// Styled components pour structurer et styliser les éléments de la page de détails de recette
+const RecipeContainer = styled.div`
   max-width: 800px;
-  margin: auto;
+  margin: 20px auto;
   padding: 20px;
-`;
-
-// Définition du style pour la carte de la recette
-const RecipeCard = styled.div`
-  width: 100%;
-  max-width: 600px;
+  border: 1px solid lightgrey;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
-// Définition du style pour l'image de la recette
 const RecipeImage = styled.img`
   width: 100%;
   height: 300px;
   object-fit: cover;
+  border-radius: 8px;
 `;
 
-// Définition du style pour la section des détails de la recette
-const RecipeDetails = styled.div`
-  padding: 20px;
+const RecipeTitle = styled.h1`
+  font-size: 24px;
+  margin-bottom: 20px;
 `;
 
-// Définition du style pour le titre de la recette
-const RecipeTitle = styled.h2`
-  font-weight: bold;
-  margin-bottom: 8px;
-`;
-
-// Définition du style pour la catégorie de la recette
 const RecipeCategory = styled.p`
-  margin-bottom: 8px;
+  font-size: 18px;
+  color: grey;
+  margin-bottom: 20px;
 `;
 
-// Définition du style pour la liste des ingrédients de la recette
-const RecipeIngredients = styled.p`
-  margin-bottom: 8px;
+const RecipeSection = styled.div`
+  margin-bottom: 20px;
 `;
 
-// Définition du style pour les instructions de la recette
-const RecipeInstructions = styled.p`
-  margin-bottom: 8px;
-`;
+// Composant principal pour afficher les détails d'une recette
+const RecipeDetail = () => {
+  const { id } = useParams(); // Récupérer l'ID de la recette depuis l'URL
+  const [recipe, setRecipe] = useState(null); // État local pour stocker les détails de la recette
 
-// Composant RecipeDetail pour afficher les détails d'une recette
-const RecipeDetail = ({ recipes }) => {
-  const { id } = useParams(); // Récupération du paramètre id depuis l'URL
-  const recipe = recipes.find((recipe) => recipe.id === parseInt(id)); // Recherche de la recette correspondant à l'id
+  useEffect(() => {
+    // Fonction pour récupérer les détails de la recette depuis l'API
+    const fetchRecipe = async () => {
+      try {
+        const response = await api.get(`/recipes/${id}`); // Requête API pour obtenir la recette
+        setRecipe(response.data); // Mettre à jour l'état avec les données de la recette
+      } catch (error) {
+        console.error('Error fetching recipe:', error); // Gérer les erreurs éventuelles
+      }
+    };
+    fetchRecipe(); // Appel de la fonction pour récupérer la recette
+  }, [id]); // Dépendances pour exécuter l'effet lorsque l'ID change
 
-  // Si la recette n'est pas trouvée, afficher un message d'erreur
   if (!recipe) {
-    return <p>Recette non trouvée.</p>;
+    return <div>Loading...</div>; // Afficher un message de chargement si la recette n'est pas encore disponible
   }
 
-  // Affichage des détails de la recette
   return (
-    <StyledRecipeDetail>
-      <h2>Détails de la Recette</h2>
-      <RecipeCard>
-        <RecipeImage src={recipe.imageUrl} alt={recipe.recipeName} /> {/* Affichage de l'image de la recette */}
-        <RecipeDetails>
-          <RecipeTitle>{recipe.recipeName}</RecipeTitle> {/* Affichage du titre de la recette */}
-          <RecipeCategory><strong>Catégorie:</strong> {recipe.category}</RecipeCategory> {/* Affichage de la catégorie */}
-          <RecipeIngredients><strong>Ingrédients:</strong> {recipe.ingredients}</RecipeIngredients> {/* Affichage des ingrédients */}
-          <RecipeInstructions><strong>Instructions:</strong> {recipe.instructions}</RecipeInstructions> {/* Affichage des instructions */}
-        </RecipeDetails>
-      </RecipeCard>
-    </StyledRecipeDetail>
+    <RecipeContainer>
+      <RecipeImage src={recipe.imageUrl} alt={recipe.name} /> {/* Image de la recette */}
+      <RecipeTitle>{recipe.name}</RecipeTitle> {/* Nom de la recette */}
+      <RecipeCategory>Catégorie: {recipe.category}</RecipeCategory> {/* Catégorie de la recette */}
+      <RecipeSection>
+        <h2>Ingrédients:</h2>
+        <p>{recipe.ingredients}</p> {/* Ingrédients de la recette */}
+      </RecipeSection>
+      <RecipeSection>
+        <h2>Instructions:</h2>
+        <p>{recipe.instructions}</p> {/* Instructions de la recette */}
+      </RecipeSection>
+    </RecipeContainer>
   );
 };
 
-export default RecipeDetail; // Exportation du composant RecipeDetail
+export default RecipeDetail; // Exporter le composant pour l'utiliser dans d'autres parties de l'application

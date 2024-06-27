@@ -1,35 +1,25 @@
 import React, { createContext, useState } from 'react';
 
-// Création du contexte d'authentification
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-// Fonction de fournisseur d'authentification (provider)
-export const AuthProvider = ({ children }) => {
-  // État d'authentification initial (exemple simplifié)
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const AuthProvider = ({ children }) => {
+  const [auth, setAuth] = useState(null);
 
-  // Fonction de connexion
-  const login = (username, password) => {
-    // Logique d'authentification (exemple simplifié)
-    if (username === 'admin' && password === 'password') {
-      setIsAuthenticated(true);
-      return true;
-    } else {
-      return false;
-    }
+  const login = (token) => {
+    setAuth({ token });
+    localStorage.setItem('token', token);
   };
 
-  // Fonction de déconnexion
   const logout = () => {
-    setIsAuthenticated(false);
+    setAuth(null);
+    localStorage.removeItem('token');
   };
 
-  // Contexte fournit la valeur aux composants enfants
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthContext;
+export default AuthProvider;
